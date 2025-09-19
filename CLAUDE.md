@@ -36,6 +36,15 @@ A TypeScript CLI tool for finding businesses without professional websites and e
 - PRs must reference issue: "Fixes #[number]"
 - Issues only closed after PR is merged and verified
 
+### 4. PULL REQUEST WORKFLOW - MANDATORY
+
+- **EVERY** completed feature MUST have a pull request
+- **ALWAYS** use GitHub CLI: `gh pr create` with proper title and body
+- **REQUIRED**: Include "Fixes #[number]" to auto-close issues
+- **REQUIRED**: Include test plan with checkboxes in PR description
+- **REQUIRED**: All tests must pass before PR creation
+- Never merge without a PR - even for small changes
+
 ## 📋 Core Functionality (Focused Scope)
 
 ### What We ARE Building
@@ -209,15 +218,38 @@ describe('BusinessProspector', () => {
    - Repeat until feature complete
 
 4. **Create Pull Request**
-   - Reference issue: "Fixes #[number]"
-   - Include test coverage report
-   - Verify all checks pass
-   - Request review if needed
+   - Push feature branch: `git push -u origin feat/issue-[number]-[description]`
+   - Create PR: `gh pr create --title "feat: descriptive title" --body "..."`
+   - **ALWAYS** reference issue: "Fixes #[number]" in PR body
+   - Include comprehensive test coverage report
+   - Include test plan with checkboxes
+   - Verify all checks pass before requesting review
+   - **REQUIRED**: Every feature must have a linked PR
+
+   **PR Body Template**:
+   ```markdown
+   ## Summary
+   Brief description of changes made
+
+   ## Changes Made
+   - ✅ Item 1 completed
+   - ✅ Item 2 completed
+
+   ## Test plan
+   - [x] Tests pass
+   - [x] TypeScript compiles
+   - [x] Linting passes
+   - [x] Feature works as expected
+
+   ## Fixes #[issue-number]
+
+   🤖 Generated with [Claude Code](https://claude.ai/code)
+   ```
 
 5. **Merge and Close**
    - Merge PR after all checks pass
-   - Verify issue is auto-closed
-   - Delete feature branch
+   - Verify issue is auto-closed by "Fixes #[number]"
+   - Delete feature branch after merge
 
 ### Git Commit Standards
 ```bash
