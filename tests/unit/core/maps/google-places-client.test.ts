@@ -5,6 +5,7 @@ import { GooglePlacesClient } from '../../../../src/core/maps/google-places-clie
 // Mock axios
 vi.mock('axios');
 const mockedAxios = vi.mocked(axios);
+mockedAxios.isAxiosError = vi.fn();
 
 describe('GooglePlacesClient', () => {
   let client: GooglePlacesClient;
@@ -132,13 +133,15 @@ describe('GooglePlacesClient', () => {
     });
 
     it('should handle rate limiting (429 status)', async () => {
-      const rateLimitError = {
-        response: {
-          status: 429,
-          data: { error_message: 'Rate limit exceeded' },
-        },
+      const rateLimitError = new Error('Rate limit exceeded');
+      (rateLimitError as any).response = {
+        status: 429,
+        data: { error_message: 'Rate limit exceeded' },
       };
+      (rateLimitError as any).isAxiosError = true;
+
       mockedAxios.get.mockRejectedValueOnce(rateLimitError);
+      mockedAxios.isAxiosError.mockReturnValue(true);
 
       await expect(
         client.searchBusinesses('cleaning services', 'Tampa, FL')
