@@ -11,6 +11,14 @@ A TypeScript CLI tool for finding businesses without professional websites and e
 
 ## 🚫 STRICT DEVELOPMENT RULES - Never Break These
 
+### 0. FEATURE BRANCH WORKFLOW - ALWAYS REQUIRED
+
+- **ALWAYS** create a feature branch before starting ANY work
+- Branch naming: `feat/issue-[number]-[brief-description]`
+- **NEVER** work directly on main branch
+- Example: `git checkout -b feat/issue-1-initialize-typescript-cli`
+- **CRITICAL**: Start every task by creating the proper branch first
+
 ### 1. NO JAVASCRIPT - TYPESCRIPT ONLY
 
 - **NEVER** write JavaScript files (.js) in this project
