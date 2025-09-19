@@ -5,7 +5,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project: D13 Business Prospector CLI Tool
 
 ### Purpose
-A TypeScript CLI tool for finding businesses without professional websites and extracting their data for sales prospecting. This tool focuses on discovering high-opportunity prospects in specific industries and locations.
+A TypeScript CLI tool for finding businesses without professional websites and extracting their data for sales prospecting. This tool focuses on discovering high-opportunity prospects in specific industries and locations. **The extracted business data is specifically formatted to populate D13 Digital's business presence website templates**, enabling rapid deployment of professional websites for prospective clients.
+
+**Template Integration**: Data output is structured to match the `BusinessConfig` interface used in D13's website templates (e.g., [CleaningServiceTemplate](https://github.com/D13DigitalMarketing/CleaningServiceTemplate)), allowing seamless population of business information, contact details, hours, services, and local SEO data.
 
 ## 🚫 STRICT DEVELOPMENT RULES - Never Break These
 
@@ -49,6 +51,48 @@ A TypeScript CLI tool for finding businesses without professional websites and e
 - CRM integration
 - Hosting/deployment tools
 - Customer management features
+
+## 🎯 Template Integration & Data Output
+
+### Target Template Compatibility
+This prospector tool is designed to extract and format business data for D13 Digital's website templates:
+
+- **Primary Template**: [CleaningServiceTemplate](https://github.com/D13DigitalMarketing/CleaningServiceTemplate)
+- **Output Format**: TypeScript `BusinessConfig` interface compatibility
+- **Use Case**: Rapid website deployment for prospects with poor/no web presence
+
+### Required Data Extraction Fields
+The tool must extract data to populate these template sections:
+
+```typescript
+interface BusinessConfig {
+  company: {
+    name: string;
+    legalName?: string;
+    owner?: string;
+    website?: string;
+    foundingYear?: number;
+  };
+  contact: {
+    phone: string;
+    email: string;
+    address: AddressInfo;
+  };
+  hours: BusinessHours;
+  socialMedia: SocialMediaAccount[];
+  features: BusinessFeatures;
+  rating: RatingInfo;
+  seo: SEOConfig;
+  schema: SchemaConfig;
+  services: ServiceConfig;
+}
+```
+
+### Data Mapping Priority
+1. **Essential**: Company name, phone, address, primary service
+2. **High Priority**: Business hours, rating/reviews, social media
+3. **SEO Critical**: Service keywords, local area, business type
+4. **Optional**: Website quality analysis, owner info, certifications
 
 ## 🏗️ Architecture Overview
 
@@ -217,7 +261,7 @@ npm run cli extract business-id-123 --format json
 
 ## 📈 Data Models
 
-### Core Business Data Structure
+### Core Business Data Structure (Template-Compatible)
 ```typescript
 interface BusinessProspect {
   id: string;
@@ -230,6 +274,9 @@ interface BusinessProspect {
   webPresence: WebPresenceAnalysis;
   opportunityScore: number;
   extractedAt: Date;
+
+  // Template-ready configuration
+  templateConfig: BusinessConfig;  // Ready for D13 template deployment
 }
 
 interface WebPresenceAnalysis {
@@ -238,6 +285,19 @@ interface WebPresenceAnalysis {
   websiteQuality: 'excellent' | 'good' | 'poor' | 'none';
   issues: string[];
   opportunities: string[];
+}
+
+// Template-compatible business configuration (matches D13 templates)
+interface BusinessConfig {
+  company: CompanyInfo;
+  contact: ContactInfo;
+  hours: BusinessHours;
+  socialMedia: SocialMediaAccount[];
+  features: BusinessFeatures;
+  rating: RatingInfo;
+  seo: SEOConfig;
+  schema: SchemaConfig;
+  services: ServiceConfig;
 }
 ```
 
