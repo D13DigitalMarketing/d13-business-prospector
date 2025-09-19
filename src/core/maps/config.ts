@@ -101,7 +101,10 @@ export class MapsConfigManager {
         errors.push('Scraping max retries must be non-negative');
       }
 
-      if (!this.config.scraping.userAgent || this.config.scraping.userAgent.trim() === '') {
+      if (
+        !this.config.scraping.userAgent ||
+        this.config.scraping.userAgent.trim() === ''
+      ) {
         errors.push('Scraping user agent is required');
       }
 
@@ -128,7 +131,10 @@ export class MapsConfigManager {
         headless: this.parseBoolean(process.env.SCRAPING_HEADLESS, true),
         timeout: this.parseInt(process.env.SCRAPING_TIMEOUT, 30000),
         maxRetries: this.parseInt(process.env.SCRAPING_MAX_RETRIES, 3),
-        respectRobots: this.parseBoolean(process.env.SCRAPING_RESPECT_ROBOTS, true),
+        respectRobots: this.parseBoolean(
+          process.env.SCRAPING_RESPECT_ROBOTS,
+          true
+        ),
         userAgent:
           process.env.SCRAPING_USER_AGENT ||
           'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
@@ -138,16 +144,25 @@ export class MapsConfigManager {
         },
       },
       rateLimiting: {
-        requestsPerSecond: this.parseInt(process.env.RATE_LIMIT_REQUESTS_PER_SECOND, 10),
+        requestsPerSecond: this.parseInt(
+          process.env.RATE_LIMIT_REQUESTS_PER_SECOND,
+          10
+        ),
         maxRetries: this.parseInt(process.env.RATE_LIMIT_MAX_RETRIES, 3),
         baseDelay: this.parseInt(process.env.RATE_LIMIT_BASE_DELAY, 1000),
         maxDelay: this.parseInt(process.env.RATE_LIMIT_MAX_DELAY, 30000),
-        backoffMultiplier: this.parseFloat(process.env.RATE_LIMIT_BACKOFF_MULTIPLIER, 2),
+        backoffMultiplier: this.parseFloat(
+          process.env.RATE_LIMIT_BACKOFF_MULTIPLIER,
+          2
+        ),
       },
     };
   }
 
-  private parseBoolean(value: string | undefined, defaultValue: boolean): boolean {
+  private parseBoolean(
+    value: string | undefined,
+    defaultValue: boolean
+  ): boolean {
     if (value === undefined) return defaultValue;
     return value.toLowerCase() === 'true';
   }

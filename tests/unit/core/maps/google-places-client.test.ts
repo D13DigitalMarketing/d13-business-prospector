@@ -3,9 +3,14 @@ import axios from 'axios';
 import { GooglePlacesClient } from '../../../../src/core/maps/google-places-client.js';
 
 // Mock axios
-vi.mock('axios');
-const mockedAxios = vi.mocked(axios);
-mockedAxios.isAxiosError = vi.fn();
+vi.mock('axios', () => ({
+  default: {
+    get: vi.fn(),
+    isAxiosError: vi.fn(),
+  },
+}));
+
+const mockedAxios = vi.mocked(axios, true);
 
 describe('GooglePlacesClient', () => {
   let client: GooglePlacesClient;
@@ -98,9 +103,9 @@ describe('GooglePlacesClient', () => {
     });
 
     it('should handle empty query gracefully', async () => {
-      await expect(
-        client.searchBusinesses('', 'Tampa, FL')
-      ).rejects.toThrow('Query is required');
+      await expect(client.searchBusinesses('', 'Tampa, FL')).rejects.toThrow(
+        'Query is required'
+      );
     });
 
     it('should handle empty location gracefully', async () => {

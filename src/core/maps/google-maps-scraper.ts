@@ -1,4 +1,4 @@
-import { chromium, Browser, Page } from 'playwright';
+import { chromium, type Browser, type Page } from 'playwright';
 import axios from 'axios';
 
 export interface ScraperConfig {
@@ -13,23 +13,23 @@ export interface ScraperConfig {
 export interface ScrapedBusinessResult {
   name: string;
   address: string;
-  rating?: number;
-  reviewCount?: number;
-  phone?: string;
-  website?: string;
-  businessUrl?: string;
+  rating?: number | undefined;
+  reviewCount?: number | undefined;
+  phone?: string | undefined;
+  website?: string | undefined;
+  businessUrl?: string | undefined;
 }
 
 export interface ScrapedBusinessDetails {
   name: string;
   address: string;
-  phone?: string;
-  website?: string;
-  hours?: string[];
-  rating?: number;
-  reviewCount?: number;
-  priceLevel?: string;
-  photos?: string[];
+  phone?: string | undefined;
+  website?: string | undefined;
+  hours?: string[] | undefined;
+  rating?: number | undefined;
+  reviewCount?: number | undefined;
+  priceLevel?: string | undefined;
+  photos?: string[] | undefined;
 }
 
 export class GoogleMapsScraper {
@@ -84,17 +84,30 @@ export class GoogleMapsScraper {
 
       // Extract business data
       const businesses = await page.evaluate(() => {
+        /* eslint-disable no-undef */
         const results: any[] = [];
-        const businessElements = document.querySelectorAll('[data-result-index]');
+        const businessElements = document.querySelectorAll(
+          '[data-result-index]'
+        );
 
         businessElements.forEach((element) => {
           try {
-            const nameElement = element.querySelector('[data-value="Business name"]');
-            const addressElement = element.querySelector('[data-value="Address"]');
-            const ratingElement = element.querySelector('[data-value="Rating"]');
-            const reviewsElement = element.querySelector('[data-value="Reviews"]');
+            const nameElement = element.querySelector(
+              '[data-value="Business name"]'
+            );
+            const addressElement = element.querySelector(
+              '[data-value="Address"]'
+            );
+            const ratingElement = element.querySelector(
+              '[data-value="Rating"]'
+            );
+            const reviewsElement = element.querySelector(
+              '[data-value="Reviews"]'
+            );
             const phoneElement = element.querySelector('[data-value="Phone"]');
-            const websiteElement = element.querySelector('[data-value="Website"]');
+            const websiteElement = element.querySelector(
+              '[data-value="Website"]'
+            );
             const linkElement = element.querySelector('a[href*="/place/"]');
 
             const name = nameElement?.textContent?.trim();
@@ -105,7 +118,9 @@ export class GoogleMapsScraper {
                 name,
                 address,
                 rating: ratingElement?.textContent?.trim(),
-                reviewCount: reviewsElement?.textContent?.trim()?.replace(/[^\d]/g, ''),
+                reviewCount: reviewsElement?.textContent
+                  ?.trim()
+                  ?.replace(/[^\d]/g, ''),
                 phone: phoneElement?.textContent?.trim(),
                 website: websiteElement?.getAttribute('href'),
                 businessUrl: linkElement?.getAttribute('href'),
@@ -117,6 +132,7 @@ export class GoogleMapsScraper {
         });
 
         return results;
+        /* eslint-enable no-undef */
       });
 
       return this.mapScrapedResults(businesses);
@@ -125,7 +141,9 @@ export class GoogleMapsScraper {
     }
   }
 
-  async getBusinessDetails(businessUrl: string): Promise<ScrapedBusinessDetails> {
+  async getBusinessDetails(
+    businessUrl: string
+  ): Promise<ScrapedBusinessDetails> {
     if (!businessUrl || businessUrl.trim() === '') {
       throw new Error('Business URL is required');
     }
@@ -143,16 +161,31 @@ export class GoogleMapsScraper {
       });
 
       const details = await page.evaluate(() => {
+        /* eslint-disable no-undef */
         try {
-          const nameElement = document.querySelector('[data-value="Business name"]');
-          const addressElement = document.querySelector('[data-value="Address"]');
+          const nameElement = document.querySelector(
+            '[data-value="Business name"]'
+          );
+          const addressElement = document.querySelector(
+            '[data-value="Address"]'
+          );
           const phoneElement = document.querySelector('[data-value="Phone"]');
-          const websiteElement = document.querySelector('[data-value="Website"]');
+          const websiteElement = document.querySelector(
+            '[data-value="Website"]'
+          );
           const ratingElement = document.querySelector('[data-value="Rating"]');
-          const reviewsElement = document.querySelector('[data-value="Reviews"]');
-          const hoursElements = document.querySelectorAll('[data-value*="hours"]');
-          const priceLevelElement = document.querySelector('[data-value="Price level"]');
-          const photoElements = document.querySelectorAll('[data-value="Photo"] img');
+          const reviewsElement = document.querySelector(
+            '[data-value="Reviews"]'
+          );
+          const hoursElements = document.querySelectorAll(
+            '[data-value*="hours"]'
+          );
+          const priceLevelElement = document.querySelector(
+            '[data-value="Price level"]'
+          );
+          const photoElements = document.querySelectorAll(
+            '[data-value="Photo"] img'
+          );
 
           return {
             name: nameElement?.textContent?.trim(),
@@ -160,15 +193,22 @@ export class GoogleMapsScraper {
             phone: phoneElement?.textContent?.trim(),
             website: websiteElement?.getAttribute('href'),
             rating: ratingElement?.textContent?.trim(),
-            reviewCount: reviewsElement?.textContent?.trim()?.replace(/[^\d]/g, ''),
-            hours: Array.from(hoursElements).map((el) => el.textContent?.trim()).filter(Boolean),
+            reviewCount: reviewsElement?.textContent
+              ?.trim()
+              ?.replace(/[^\d]/g, ''),
+            hours: Array.from(hoursElements)
+              .map((el) => el.textContent?.trim())
+              .filter(Boolean),
             priceLevel: priceLevelElement?.textContent?.trim(),
-            photos: Array.from(photoElements).map((img: any) => img.src).filter(Boolean),
+            photos: Array.from(photoElements)
+              .map((img: any) => img.src)
+              .filter(Boolean),
           };
         } catch (error) {
           console.warn('Error extracting business details:', error);
           return null;
         }
+        /* eslint-enable no-undef */
       });
 
       if (!details) {
@@ -207,7 +247,9 @@ export class GoogleMapsScraper {
   }
 
   private async setupPage(page: Page): Promise<void> {
-    await page.setUserAgent(this.config.userAgent);
+    await page.setExtraHTTPHeaders({
+      'User-Agent': this.config.userAgent,
+    });
     await page.setViewportSize(this.config.viewport);
 
     // Set reasonable timeouts
@@ -237,7 +279,9 @@ export class GoogleMapsScraper {
         name: result.name,
         address: result.address,
         rating: result.rating ? parseFloat(result.rating) : undefined,
-        reviewCount: result.reviewCount ? parseInt(result.reviewCount) : undefined,
+        reviewCount: result.reviewCount
+          ? parseInt(result.reviewCount)
+          : undefined,
         phone: result.phone || undefined,
         website: result.website || undefined,
         businessUrl: result.businessUrl || undefined,
@@ -252,7 +296,9 @@ export class GoogleMapsScraper {
       website: details.website || undefined,
       hours: details.hours || undefined,
       rating: details.rating ? parseFloat(details.rating) : undefined,
-      reviewCount: details.reviewCount ? parseInt(details.reviewCount) : undefined,
+      reviewCount: details.reviewCount
+        ? parseInt(details.reviewCount)
+        : undefined,
       priceLevel: details.priceLevel || undefined,
       photos: details.photos || undefined,
     };

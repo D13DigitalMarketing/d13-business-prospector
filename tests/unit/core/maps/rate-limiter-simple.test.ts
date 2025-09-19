@@ -62,13 +62,17 @@ describe('ExponentialBackoffRateLimiter - Simple Tests', () => {
       const error = { response: { status: 400 } };
       const mockOperation = () => Promise.reject(error);
 
-      await expect(rateLimiter.retryWithBackoff(mockOperation)).rejects.toEqual(error);
+      await expect(rateLimiter.retryWithBackoff(mockOperation)).rejects.toEqual(
+        error
+      );
     });
   });
 
   describe('getQueueStatus', () => {
     it('should return correct queue status structure', () => {
-      const rateLimiter = new ExponentialBackoffRateLimiter({ requestsPerSecond: 5 });
+      const rateLimiter = new ExponentialBackoffRateLimiter({
+        requestsPerSecond: 5,
+      });
       const status = rateLimiter.getQueueStatus();
 
       expect(status).toHaveProperty('queueLength');

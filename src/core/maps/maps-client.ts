@@ -1,34 +1,46 @@
-import { GooglePlacesClient, BusinessSearchResult, BusinessDetails } from './google-places-client.js';
-import { GoogleMapsScraper, ScrapedBusinessResult, ScrapedBusinessDetails } from './google-maps-scraper.js';
+import {
+  GooglePlacesClient,
+  type BusinessSearchResult,
+  type BusinessDetails,
+} from './google-places-client.js';
+import {
+  GoogleMapsScraper,
+  type ScrapedBusinessResult,
+  type ScrapedBusinessDetails,
+} from './google-maps-scraper.js';
 import { ExponentialBackoffRateLimiter } from './rate-limiter.js';
-import { mapsConfig, MapsConfig } from './config.js';
+import { mapsConfig, type MapsConfig } from './config.js';
 
 export interface UnifiedBusinessResult {
-  id?: string;
+  id?: string | undefined;
   name: string;
   address: string;
-  location?: {
-    latitude: number;
-    longitude: number;
-  };
-  rating?: number;
-  reviewCount?: number;
-  phone?: string;
-  website?: string;
-  types?: string[];
-  businessStatus?: string;
-  priceLevel?: number | string;
+  location?:
+    | {
+        latitude: number;
+        longitude: number;
+      }
+    | undefined;
+  rating?: number | undefined;
+  reviewCount?: number | undefined;
+  phone?: string | undefined;
+  website?: string | undefined;
+  types?: string[] | undefined;
+  businessStatus?: string | undefined;
+  priceLevel?: number | string | undefined;
   source: 'api' | 'scraper';
 }
 
 export interface UnifiedBusinessDetails extends UnifiedBusinessResult {
-  openingHours?: string[];
-  reviews?: Array<{
-    rating: number;
-    text: string;
-    time: number;
-  }>;
-  photos?: string[];
+  openingHours?: string[] | undefined;
+  reviews?:
+    | Array<{
+        rating: number;
+        text: string;
+        time: number;
+      }>
+    | undefined;
+  photos?: string[] | undefined;
 }
 
 export class MapsClient {
@@ -38,7 +50,9 @@ export class MapsClient {
   private scraper?: GoogleMapsScraper;
 
   constructor(config?: Partial<MapsConfig>) {
-    this.config = config ? { ...mapsConfig.getConfig(), ...config } : mapsConfig.getConfig();
+    this.config = config
+      ? { ...mapsConfig.getConfig(), ...config }
+      : mapsConfig.getConfig();
 
     // Validate configuration
     const validation = mapsConfig.validateConfig();
@@ -46,7 +60,9 @@ export class MapsClient {
       throw new Error(`Invalid configuration: ${validation.errors.join(', ')}`);
     }
 
-    this.rateLimiter = new ExponentialBackoffRateLimiter(this.config.rateLimiting);
+    this.rateLimiter = new ExponentialBackoffRateLimiter(
+      this.config.rateLimiting
+    );
 
     // Initialize clients based on configuration
     if (this.config.googlePlacesApiKey) {
@@ -116,7 +132,9 @@ export class MapsClient {
       }
     }
 
-    throw new Error('No search methods available. Please configure API key or enable scraping.');
+    throw new Error(
+      'No search methods available. Please configure API key or enable scraping.'
+    );
   }
 
   async getBusinessDetails(
@@ -126,7 +144,8 @@ export class MapsClient {
     // Try API first if we have a place ID and API client
     if (businessId && this.placesClient) {
       try {
-        const apiDetails = await this.placesClient.getBusinessDetails(businessId);
+        const apiDetails =
+          await this.placesClient.getBusinessDetails(businessId);
         return this.mapApiDetails(apiDetails);
       } catch (error) {
         console.warn('API details fetch failed, trying scraper:', error);
@@ -136,7 +155,8 @@ export class MapsClient {
     // Try scraper if we have a business URL
     if (businessUrl && this.scraper) {
       try {
-        const scraperDetails = await this.scraper.getBusinessDetails(businessUrl);
+        const scraperDetails =
+          await this.scraper.getBusinessDetails(businessUrl);
         return this.mapScraperDetails(scraperDetails);
       } catch (error) {
         console.warn('Scraper details fetch failed:', error);
@@ -144,7 +164,9 @@ export class MapsClient {
       }
     }
 
-    throw new Error('Unable to fetch business details. No valid business ID or URL provided.');
+    throw new Error(
+      'Unable to fetch business details. No valid business ID or URL provided.'
+    );
   }
 
   async cleanup(): Promise<void> {
@@ -157,7 +179,10 @@ export class MapsClient {
     return this.rateLimiter.getQueueStatus();
   }
 
-  private async searchWithApi(query: string, location: string): Promise<BusinessSearchResult[]> {
+  private async searchWithApi(
+    query: string,
+    location: string
+  ): Promise<BusinessSearchResult[]> {
     if (!this.placesClient) {
       throw new Error('Places API client not available');
     }
@@ -180,7 +205,9 @@ export class MapsClient {
     );
   }
 
-  private mapApiResults(results: BusinessSearchResult[]): UnifiedBusinessResult[] {
+  private mapApiResults(
+    results: BusinessSearchResult[]
+  ): UnifiedBusinessResult[] {
     return results.map((result) => ({
       id: result.id,
       name: result.name,
@@ -195,7 +222,9 @@ export class MapsClient {
     }));
   }
 
-  private mapScraperResults(results: ScrapedBusinessResult[]): UnifiedBusinessResult[] {
+  private mapScraperResults(
+    results: ScrapedBusinessResult[]
+  ): UnifiedBusinessResult[] {
     return results.map((result) => ({
       name: result.name,
       address: result.address,
@@ -222,7 +251,9 @@ export class MapsClient {
     };
   }
 
-  private mapScraperDetails(details: ScrapedBusinessDetails): UnifiedBusinessDetails {
+  private mapScraperDetails(
+    details: ScrapedBusinessDetails
+  ): UnifiedBusinessDetails {
     return {
       name: details.name,
       address: details.address,

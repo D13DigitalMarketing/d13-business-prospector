@@ -1,8 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { MapsConfigManager } from '../../../../src/core/maps/config.js';
 
 describe('MapsConfigManager', () => {
-  let originalEnv: NodeJS.ProcessEnv;
+  let originalEnv: typeof process.env;
 
   beforeEach(() => {
     originalEnv = { ...process.env };
@@ -281,7 +281,9 @@ describe('MapsConfigManager', () => {
       expect(updatedConfig.useApiFirst).toBe(false);
       expect(updatedConfig.rateLimiting.requestsPerSecond).toBe(5);
       // Other values should remain unchanged
-      expect(updatedConfig.scraping.enabled).toBe(originalConfig.scraping.enabled);
+      expect(updatedConfig.scraping.enabled).toBe(
+        originalConfig.scraping.enabled
+      );
     });
 
     it('should not modify original config when getting config', () => {

@@ -23,9 +23,9 @@ describe('GoogleMapsScraper - Simple Tests', () => {
     it('should reject empty query in searchBusinesses', async () => {
       const scraper = new GoogleMapsScraper({ respectRobots: false });
 
-      await expect(
-        scraper.searchBusinesses('', 'Tampa, FL')
-      ).rejects.toThrow('Query is required');
+      await expect(scraper.searchBusinesses('', 'Tampa, FL')).rejects.toThrow(
+        'Query is required'
+      );
     });
 
     it('should reject empty location in searchBusinesses', async () => {
@@ -39,9 +39,9 @@ describe('GoogleMapsScraper - Simple Tests', () => {
     it('should reject empty business URL in getBusinessDetails', async () => {
       const scraper = new GoogleMapsScraper({ respectRobots: false });
 
-      await expect(
-        scraper.getBusinessDetails('')
-      ).rejects.toThrow('Business URL is required');
+      await expect(scraper.getBusinessDetails('')).rejects.toThrow(
+        'Business URL is required'
+      );
     });
   });
 

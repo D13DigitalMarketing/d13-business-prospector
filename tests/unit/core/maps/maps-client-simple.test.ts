@@ -54,9 +54,9 @@ describe('MapsClient - Simple Tests', () => {
 
       const client = new MapsClient(config);
 
-      await expect(
-        client.searchBusinesses('', 'Tampa, FL')
-      ).rejects.toThrow('Query is required');
+      await expect(client.searchBusinesses('', 'Tampa, FL')).rejects.toThrow(
+        'Query is required'
+      );
 
       await expect(
         client.searchBusinesses('cleaning services', '')
